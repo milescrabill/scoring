@@ -1,22 +1,25 @@
-# s3 = AWS::S3.new(
-#   :access_key_id => 'abc',
-#   :secret_access_key => '123'
-# )
+require 'aws'
 
-scorefile = "score"
-mode = "r"
-bucketname = "recon"
+s3 = AWS::S3.new(
+  :access_key_id => 'abc',
+  :secret_access_key => '123'
+)
 
-# Bucket.create(bucketname)
+scorefile = 'score'
+bucketname = 'edurange'
 
-scoreagent = File.new(scorefile, mode)
+unless bucket.exists?
+  s3.buckets.create(bucketname)
+
+bucket = s3.buckets[bucketname] 
+scoreagent = File.new(scorefile, 'r')
 contents = File.read(scorefile)
 mtime = scoreagent.mtime
 
 loop do
   if scoreagent.mtime > mtime
-    # S3Object.store(scorefile, open(scorefile), bucketname)
-    log = "log"
+    S3Object.store(scorefile, open(scorefile), bucketname)
+    log = 'log'
     File.open(log, 'a') { |log| log.puts(mtime.to_s + "\n" + contents + "\n") }
     mtime = scoreagent.mtime
   end
