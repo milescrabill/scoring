@@ -1,22 +1,23 @@
-AWS::S3::Base.establish_connection!(
-  :access_key_id     => 'abc',
-  :secret_access_key => '123'
-)
+# s3 = AWS::S3.new(
+#   :access_key_id => 'abc',
+#   :secret_access_key => '123'
+# )
 
-scorefile = "scoreagent"
+scorefile = "score"
 mode = "r"
 bucketname = "recon"
 
-Bucket.create(bucketname)
+# Bucket.create(bucketname)
 
 scoreagent = File.new(scorefile, mode)
+contents = File.read(scorefile)
 mtime = scoreagent.mtime
 
 loop do
   if scoreagent.mtime > mtime
-    S3Object.store(scorefile, open(scorefile), bucketname)
+    # S3Object.store(scorefile, open(scorefile), bucketname)
     log = "log"
-    File.open(log, 'w') { |log| log.write(mtime) }
+    File.open(log, 'a') { |log| log.puts(mtime.to_s + "\n" + contents + "\n") }
     mtime = scoreagent.mtime
   end
 end
