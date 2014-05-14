@@ -1,13 +1,13 @@
-require 'aws'
+#!/usr/bin/env ruby
 
-s3 = AWS::S3.new(
-  :access_key_id => 'abc',
-  :secret_access_key => '123'
-)
+require "aws"
+require "daemons"
 
-scorefile = 'score'
-bucketname = 'edurange'
-log = 'log'
+s3 = AWS::S3.new
+
+scorefile = "score"
+bucketname = "edurange"
+log = "log"
 
 bucket = s3.buckets[bucketname]
 
@@ -19,13 +19,18 @@ logfile = File.new(log, 'w') unless File.exists?(log)
 
 mtime = Time.at(0)
 
-loop do
-  if scoreagent.mtime > mtime
-    mtime = scoreagent.mtime
-    contents = File.read(scorefile)
-    obj = bucket.objects[scorefile]
-    bucket.objects.create(scorefile, open(scorefile)) unless obj.exists?
-    obj.write(contents)
-    File.open(log, 'a') { |log| log.puts(mtime.to_s + "\n" + contents + "\n") }
+Daemons.run_proc(
+  'test-shit',
+  :log_output => true
+) do
+  loop do
+    if scoreagent.mtime > mtime
+      mtime = scoreagent.mtime
+      contents = File.read(scorefile)
+      obj = bucket.objects[scorefile]
+      bucket.objects.create(scorefile, open(scorefile)) unless obj.exists?
+      obj.write(contents)
+      File.open(log, 'a') { |log| log.puts(mtime.to_s + "\n" + contents + "\n") }
+    end
   end
 end
