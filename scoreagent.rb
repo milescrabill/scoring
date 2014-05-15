@@ -3,10 +3,9 @@
 require "aws"
 require "daemons"
 
+
 @s3 = AWS::S3.new
-
 @pwd = File.dirname(File.expand_path(__FILE__))
-
 @scorefile = @pwd + "/score"
 @bucketname = "edurange"
 @log = @pwd + "/log"
@@ -28,14 +27,15 @@ Daemons.run_proc(
   :log_output => true
 ) do
   loop do
-    scoreagent = File.open(@scorefile, 'r') { |s|
+      File.open(@scorefile, 'r') { |s|
       @contents = s.read
       upload and log if s.mtime > @mtime
       @mtime = s.mtime
     }
 
     sleep(0.5)
-
   end
 end
 
+#needs aws credentialse
+#get answers >> scorefile
