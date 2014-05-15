@@ -2,19 +2,23 @@
 
 require "aws"
 require "daemons"
+require 'pry'
 
 
-@s3 = AWS::S3.new
+
+@s3 = AWS::S3.new(:access_key_id => 'AKIAIT47ECWW2NUAFKPQ',
+:secret_access_key => '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')
 @pwd = File.dirname(File.expand_path(__FILE__))
 @scorefile = @pwd + "/score"
+@objname = "score"
 @bucketname = "edurange"
 @log = @pwd + "/log"
 
 def upload
   bucket = @s3.buckets[@bucketname]
   @s3.buckets.create(@bucketname) if bucket.nil?
-  obj = bucket.objects[@scorefile]
-  bucket.objects[@scorefile].write(@contents)
+  obj = bucket.objects[@objname]
+  obj.write(@contents)
 end
 
 def log
