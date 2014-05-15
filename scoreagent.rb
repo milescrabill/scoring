@@ -15,7 +15,7 @@ def upload
   bucket = @s3.buckets[@bucketname]
   @s3.buckets.create(@bucketname) if bucket.nil?
   obj = bucket.objects[@scorefile]
-  bucket.objects.create(@scorefile, open(@scorefile))
+  bucket.objects[@scorefile].write(@contents)
 end
 
 def log
