@@ -1,24 +1,30 @@
 #!/usr/bin/env ruby
+require 'daemons'
+require 'digest/md5'
+require 'net/http'
+require 'logger'
 
-require "aws"
-require "daemons"
-require 'pry'
-
-
-
-@s3 = AWS::S3.new(:access_key_id => 'AKIAIT47ECWW2NUAFKPQ',
-:secret_access_key => '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')
-@pwd = File.dirname(File.expand_path(__FILE__))
-@scorefile = @pwd + "/score"
-@objname = "score"
-@bucketname = "edurange"
-@log = @pwd + "/log"
+# @dir = File.dirname(File.expand_path(__FILE__))
+@dir = '/tmp/scoring/'
+@scorefile = @dir + "answers"
+@log = @dir + "log"
+@scoring_url = @dir + 'scoring_url'
 
 def upload
-  bucket = @s3.buckets[@bucketname]
-  @s3.buckets.create(@bucketname) if bucket.nil?
-  obj = bucket.objects[@objname]
-  obj.write(@contents)
+  # build a PUT request
+  put = Net::HTTP::Put.new(open(scoring_url).read, {
+    'content-type' => 'text/plain',
+  })
+  put.body = @contents
+
+  # send the PUT request
+  http = Net::HTTP.new('edurange.s3.amazonaws.com', '443')
+  http.set_debug_output(Logger.new($stdout))
+  http.use_ssl = true
+  http.start
+  resp = http.request(put)
+  resp = [resp.code.to_i, resp.to_hash, resp.body]
+  http.finish
 end
 
 def log
@@ -28,7 +34,7 @@ end
 @mtime = Time.at(0)
 Daemons.run_proc(
   'scorefile-upload',
-  :log_output => true
+  log_output: true
 ) do
   loop do
       File.open(@scorefile, 'r') { |s|
@@ -40,6 +46,3 @@ Daemons.run_proc(
     sleep(0.5)
   end
 end
-
-#needs aws credentialse
-#get answers >> scorefile
