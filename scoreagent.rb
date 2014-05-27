@@ -4,7 +4,9 @@ require 'digest/md5'
 require 'net/http'
 require 'logger'
 
-# @dir = File.dirname(File.expand_path(__FILE__))
+# current directory
+# @dir = File.dirname(File.expand_path(__FILE__)) + "/"
+
 @dir = '/tmp/scoring/'
 @scorefile = @dir + "answers"
 @log = @dir + "log"
@@ -12,15 +14,14 @@ require 'logger'
 
 def upload
   # build a PUT request
-  put = Net::HTTP::Put.new(open(scoring_url).read, {
+  put = Net::HTTP::Put.new(open(@scoring_url).read.chomp, {
     'content-type' => 'text/plain',
   })
   put.body = @contents
 
   # send the PUT request
-  http = Net::HTTP.new('edurange.s3.amazonaws.com', '443')
+  http = Net::HTTP.new('edurange-scoring.s3.amazonaws.com', 80)
   http.set_debug_output(Logger.new($stdout))
-  http.use_ssl = true
   http.start
   resp = http.request(put)
   resp = [resp.code.to_i, resp.to_hash, resp.body]
