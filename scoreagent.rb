@@ -12,6 +12,16 @@ require 'logger'
 @log = @dir + "log"
 @scoring_url = @dir + 'scoring_url'
 
+def check_expected_files
+  expected_files = []
+  expected_files << @scorefile << @log << @scoring_url
+  for file in expected_files
+    unless File.exists?(file)
+      raise "Expected file " + file + " not found."
+    end
+  end
+end
+
 def upload
   # build a PUT request
   put = Net::HTTP::Put.new(open(@scoring_url).read.chomp, {
