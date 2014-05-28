@@ -30,8 +30,9 @@ def upload
   put.body = @contents
 
   # send the PUT request
-  http = Net::HTTP.new('edurange-scoring.s3.amazonaws.com', 80)
+  http = Net::HTTP.new('edurange-scoring.s3.amazonaws.com', 443)
   http.set_debug_output(Logger.new($stdout))
+  http.use_ssl = true
   http.start
   resp = http.request(put)
   resp = [resp.code.to_i, resp.to_hash, resp.body]
@@ -43,6 +44,9 @@ def log
 end
 
 @mtime = Time.at(0)
+
+check_expected_files
+
 Daemons.run_proc(
   'scorefile-upload',
   log_output: true
