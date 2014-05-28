@@ -47,10 +47,7 @@ end
 
 check_expected_files
 
-Daemons.run_proc(
-  'scorefile-upload',
-  log_output: true
-) do
+Daemons.run_proc('scorefile-upload', :log_output => true) do
   loop do
       File.open(@scorefile, 'r') { |s|
       @contents = s.read
