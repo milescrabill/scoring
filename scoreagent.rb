@@ -49,11 +49,11 @@ check_expected_files
 
 Daemons.run_proc('scorefile-upload', :log_output => true) do
   loop do
-      File.open(@scorefile, 'r') { |s|
+    File.open(@scorefile, 'r') do |s|
       @contents = s.read
       upload and log if s.mtime > @mtime
       @mtime = s.mtime
-    }
+    end
 
     sleep(0.5)
   end
