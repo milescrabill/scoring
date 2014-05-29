@@ -14,7 +14,7 @@ require 'logger'
 
 def check_expected_files
   expected_files = []
-  expected_files << @scorefile << @log << @scoring_url
+  expected_files << @scorefile << @scoring_url
   for file in expected_files
     unless File.exists?(file)
       raise "Expected file " + file + " not found."
