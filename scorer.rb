@@ -7,8 +7,8 @@ def open(url)
   Net::HTTP.get(URI.parse(url))
 end
 
-answers = File.open("/tmp/answers", "r") { |f| f.read.split("\n") }
-scoring_pages = File.open("/tmp/scoring_pages", "r") { |f| f.read.split("\n") }
+answers = File.open("/tmp/scoring/answers", "r") { |f| f.read.split("\n") }
+scoring_pages = File.open("/tmp/scoring/scoring_pages", "r") { |f| f.read.split("\n") }
 
 Daemons.run_proc('edurange-scorer', :log_output => true) do
   loop do
@@ -24,7 +24,7 @@ Daemons.run_proc('edurange-scorer', :log_output => true) do
       end
     end
 
-    File.open("/tmp/points", "w+") { |f| f.write(points) }
+    File.open("/tmp/scoring/points", "w+") { |f| f.write(points) }
 
     sleep(0.5)
   end
