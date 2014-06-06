@@ -1,28 +1,23 @@
-require 'aws-sdk'
-require 'string_score/ext/string'
-require 'edurange'
+require 'net/http'
+require 'uri'
 
-s3 = AWS::S3.new
-submitted = bucket.objects[instance.uuid + "-scoring"].read
-# answers = bucket.objects["answers?"].read
+def open(url)
+  Net::HTTP.get(URI.parse(url))
+end
 
-scenario_name = "recon"
-
-answers = yml["Answers"]
-
-#accessbucket
 points = 0
 
-answers.each do |answer|
-  scorekey = StringScore.new(answer)
+answers = File.open("/tmp/answers", "r") { |f| f.read.split("\n") }
+scoring_pages = File.open("/tmp/scoring_pages", "r") { |f| f.read.split("\n") }
 
+submitted = []
+scoring_pages.each { |s| submitted << open(s) }
+
+answers.each do |answer|
   submitted.each_line do |submitted_line| 
-    if scorekey.score(submitted_line) == 1
+    if answer == submitted_line
       points += 1
   end
 end
 
 puts points
-
-#save scores
-#generate a web ui table
