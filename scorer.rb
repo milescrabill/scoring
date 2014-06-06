@@ -7,18 +7,22 @@ submitted = bucket.objects[instance.uuid + "-scoring"].read
 # answers = bucket.objects["answers?"].read
 
 scenario_name = "recon"
-YmlRecord.load_yml(scenario_name)
+
+answers = yml["Answers"]
 
 #accessbucket
 points = 0
 
-submitted.each_line do |submitted_line| 
-	scorekey = StringScore.new(submitted_line)
-	answers.each_line do |answers_line|
-    if scorekey.score(answers_line) == 1
+answers.each do |answer|
+  scorekey = StringScore.new(answer)
+
+  submitted.each_line do |submitted_line| 
+    if scorekey.score(submitted_line) == 1
       points += 1
   end
 end
+
+puts points
 
 #save scores
 #generate a web ui table
