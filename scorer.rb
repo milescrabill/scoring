@@ -18,17 +18,18 @@ Daemons.run_proc('edurange-scorer', :log_output => true) do
     
     scoring_pages.each { |s| submitted << open(s).split("\n") }
     submitted.flatten!
+    submitted.each { |s| s.chomp }
 
     answers.each do |answer|
       submitted.each do |submitted_line|
-        File.open("/tmp/scoring/log", "w+") { |f| f.write(answer + " : " + submitted_line + "\n") }
+        File.open("/tmp/scoring/log", "w+") { |f| f.write("'" + answer + "'" + " : " + "'" + submitted_line + "'" + "\n") }
         if answer == submitted_line
           points += 1
         end
       end
     end
 
-    File.open("/tmp/scoring/points", "w+") { |f| f.write(points) }
+    File.open("/tmp/scoring/points", "w+") { |f| f.write(points + "\n") }
 
     sleep(0.5)
   end
