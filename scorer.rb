@@ -9,8 +9,8 @@ end
 answers = File.open("/tmp/scoring/answers", "r") { |f| f.read.split("\n") }
 scoring_pages_url = File.open("/tmp/scoring/scoring_pages", "r") { |f| f.read }
 
-# Daemons.run_proc('edurange-scorer', :log_output => true) do
-#   loop do
+Daemons.run_proc('edurange-scorer', :log_output => true) do
+  loop do
     points = 0
     submitted = []
 
@@ -31,5 +31,5 @@ scoring_pages_url = File.open("/tmp/scoring/scoring_pages", "r") { |f| f.read }
     File.open("/tmp/scoring/points", "w+") { |f| f.write(points.to_s + "\n") }
 
     sleep(0.5)
-#   end
-# end
+  end
+end
