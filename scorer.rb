@@ -7,7 +7,10 @@ def open(url)
 end
 
 answers = File.open("/tmp/scoring/answers", "r") { |f| f.read.split("\n") }
-answers.each { |a| a.chomp }
+answers.each do |a|
+  a.chomp
+  a.strip
+end
 answers.reject! { |a| a.empty? }
 answers.uniq!
 
@@ -22,7 +25,10 @@ Daemons.run_proc('edurange-scorer', :log_output => true) do
     scoring_pages = open(scoring_pages_url).split("\n")
     scoring_pages.each { |s| submitted << open(s).split("\n") }
     submitted.flatten!
-    submitted.each { |s| s.chomp }
+    submitted.each do |s|
+      s.chomp
+      s.strip
+    end
     submitted.reject! { |s| s.empty? }
     submitted.uniq!
 
@@ -36,7 +42,7 @@ Daemons.run_proc('edurange-scorer', :log_output => true) do
     end
 
     File.open("/tmp/scoring/points", "w+") { |f| f.write(points.to_s + "\n") }
-    File.open("/tmp/scoring/log", "a+") { |f| f.write(Time.now + "\n" + loginfo) }
+    File.open("/tmp/scoring/log", "a+") { |f| f.write(Time.now.to_s + "\n" + loginfo) }
 
     sleep(0.5)
   end
