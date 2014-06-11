@@ -7,28 +7,36 @@ def open(url)
 end
 
 answers = File.open("/tmp/scoring/answers", "r") { |f| f.read.split("\n") }
+answers.each { |a| a.chomp }
+answers.reject! { |a| a.empty? }
+answers.uniq!
+
 scoring_pages_url = File.open("/tmp/scoring/scoring_pages", "r") { |f| f.read }
 
 Daemons.run_proc('edurange-scorer', :log_output => true) do
   loop do
     points = 0
     submitted = []
+    loginfo = ""
 
     scoring_pages = open(scoring_pages_url).split("\n")
     scoring_pages.each { |s| submitted << open(s).split("\n") }
     submitted.flatten!
     submitted.each { |s| s.chomp }
+    submitted.reject! { |s| s.empty? }
+    submitted.uniq!
 
     answers.each do |answer|
       submitted.each do |submitted_line|
-        File.open("/tmp/scoring/log", "a+") { |f| f.write("'" + answer + "'" + " : " + "'" + submitted_line + "'" + "\n") }
         if answer == submitted_line
+          loginfo += "'" + answer + "'" + " : " + "'" + submitted_line + "'" + "\n"
           points += 1
         end
       end
     end
 
     File.open("/tmp/scoring/points", "w+") { |f| f.write(points.to_s + "\n") }
+    File.open("/tmp/scoring/log", "a+") { |f| f.write(Time.now + "\n" + loginfo) }
 
     sleep(0.5)
   end
