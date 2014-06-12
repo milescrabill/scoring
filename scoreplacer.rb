@@ -2,7 +2,7 @@ filename = ARGV.first
 
 if filename.nil?
 	@answers_doc = []
-	prompt = "Enter Answers, when done type: 'done'"
+	prompt = "Enter Answers (one per line), when done type: 'done'"
 	puts prompt
 	loop do
 		answer = gets.chomp
